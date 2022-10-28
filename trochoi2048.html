@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Javascript : 2048 puzzle</title>
+</head>
+<body style='background: url("https://img.freepik.com/free-vector/gradient-pastel-sky-background_23-2148908629.jpg?w=2000")'>
+<center>
+    <button
+            style="padding-center: 10%;
+   margin: 10px;
+   background-color: lightskyblue;
+   padding: 7px;" onclick="return load();">New Game
+    </button>
+    <div id="canvas"></div>
+
+    <h2>Score :
+        <div style="display:inline;" id="score"></div>
+    </h2>
+    <b>HOW TO PLAY:</b> Use your arrow keys to move the tiles.
+</center>
+<img src="https://thuthuatphanmem.vn/uploads/2017/10/04/anh-dong-170_113748.gif"
+     alt="hinhanhcute"
+     style="width:350px;height:140px">
+<script type="text/javascript">
+
+    // kích thước của lưới
+    let size = 4;
+    let min = 0;
+    let max = size - 1;
+
+    let isMoved = false;
+    let score = 0;
+
+    let amthanhover = new Audio();
+    amthanhover.src = "audio/end.mp3"
+
+    let excludeIds = [];
+
+    function load() {
+        //alert("load");
+        //Load the table
+        let html = '<table border="1">';
+        for (let row = 0; row < size; row++) {
+            html += '<tr>';
+            for (let col = 0; col < size; col++) {
+                let id = row + "" + col;
+                html += '<td align="center" valign="center" height="40" width="40" id="' + id + '"></td>';
+            }
+            html += '</tr>';
+        }
+        html += '</table>';
+        //alert(html);
+        document.getElementById("canvas").innerHTML = html;
+
+        let id1 = getId();
+        let id2 = "";
+        while (true) {
+            id2 = getId();
+            if (id1 != id2)
+                break;
+        }
+        //đặt 2 giá trị ban đầu
+        document.getElementById(id1).innerHTML = "2";
+        document.getElementById(id2).innerHTML = "2";
+
+        document.getElementById(id1).style.backgroundColor = getColor(2);
+        document.getElementById(id2).style.backgroundColor = getColor(2);
+
+        score = 0;
+        document.getElementById("score").innerHTML = score;
+
+        return false;
+    }
+
+
+    function getRandom() {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    function getId() {
+        let i = getRandom();
+        let j = getRandom();
+        return i + "" + j;
+    }
+
+
+    function up() {
+        isMoved = false;
+        excludeIds = [];
+        for (let j = min; j <= max; j++) {
+            for (let i = min; i <= max; i++) {
+                let id = i + "" + j;
+                if (document.getElementById(id).innerHTML != "") {
+                    moveUp(id);
+
+                }
+            }
+        }
+        if (isMoved == true) {
+            update();
+        }
+        return false;
+    }
+
+    function moveUp(id) {
+        if (!id.startsWith(min)) {
+            let arr = id.split("");
+            let i = parseInt(arr[0]);
+            let j = parseInt(arr[1]);
+            for (let k = (i - 1); k >= min; k--) {
+                let nId = k + "" + j;
+                if (document.getElementById(nId).innerHTML != "") {
+                    let val = parseInt(document.getElementById((k + 1) + "" + j).innerHTML);
+                    let nVal = parseInt(document.getElementById(nId).innerHTML);
+                    if (val == nVal) {
+                        if (excludeIds.indexOf(nId) == -1) {
+                            excludeIds.push(nId);
+                            document.getElementById(nId).innerHTML = (val + nVal);
+                            document.getElementById(nId).style.backgroundColor = getColor((val + nVal));
+                            document.getElementById((k + 1) + "" + j).innerHTML = "";
+                            document.getElementById((k + 1) + "" + j).style.backgroundColor = "#ffffff";
+                            isMoved = true;
+                            score += (val + nVal);
+
+                        }
+                    }
+                    break;
+                } else {
+                    document.getElementById(nId).innerHTML = document.getElementById((k + 1) + "" + j).innerHTML;
+                    document.getElementById(nId).style.backgroundColor = document.getElementById((k + 1) + "" + j).style.backgroundColor;
+                    document.getElementById((k + 1) + "" + j).innerHTML = "";
+                    document.getElementById((k + 1) + "" + j).style.backgroundColor = "#ffffff";
+                    isMoved = true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function left() {
+        isMoved = false;
+        excludeIds = [];
+        for (let i = min; i <= max; i++) {
+            for (let j = min; j <= max; j++) {
+                let id = i + "" + j;
+                if (document.getElementById(id).innerHTML != "") {
+                    moveLeft(id);
+
+                }
+            }
+        }
+        if (isMoved == true) {
+            update();
+        }
+        return false;
+    }
+
+    function moveLeft(id) {
+        if (!id.endsWith(min)) {
+            let arr = id.split("");
+            let i = parseInt(arr[0]);
+            let j = parseInt(arr[1]);
+            for (let k = (j - 1); k >= min; k--) {
+                let nId = i + "" + k;
+                if (document.getElementById(nId).innerHTML != "") {
+                    let val = parseInt(document.getElementById(i + "" + (k + 1)).innerHTML);
+                    let nVal = parseInt(document.getElementById(nId).innerHTML);
+                    if (val == nVal) {
+                        if (excludeIds.indexOf(nId) == -1) {
+                            excludeIds.push(nId);
+                            document.getElementById(nId).innerHTML = (val + nVal);
+                            document.getElementById(nId).style.backgroundColor = getColor((val + nVal));
+                            document.getElementById(i + "" + (k + 1)).innerHTML = "";
+                            document.getElementById(i + "" + (k + 1)).style.backgroundColor = "#ffffff";
+                            isMoved = true;
+                            score += (val + nVal);
+
+                        }
+                    }
+                    break;
+                } else {
+                    document.getElementById(nId).innerHTML = document.getElementById(i + "" + (k + 1)).innerHTML;
+                    document.getElementById(nId).style.backgroundColor = document.getElementById(i + "" + (k + 1)).style.backgroundColor;
+                    document.getElementById(i + "" + (k + 1)).innerHTML = "";
+                    document.getElementById(i + "" + (k + 1)).style.backgroundColor = "#ffffff";
+                    isMoved = true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function down() {
+        isMoved = false;
+        excludeIds = [];
+        for (let i = min; i <= max; i++) {
+            for (let j = max; j >= min; j--) {
+                let id = j + "" + i;
+                if (document.getElementById(id).innerHTML != "") {
+                    moveDown(id);
+
+                }
+            }
+        }
+        if (isMoved == true) {
+            update();
+        }
+        return false;
+    }
+
+    function moveDown(id) {
+        if (!id.startsWith(max)) {
+            let arr = id.split("");
+            let i = parseInt(arr[0]);
+            let j = parseInt(arr[1]);
+            for (let k = (i + 1); k <= max; k++) {
+                let nId = k + "" + j;
+                if (document.getElementById(nId).innerHTML != "") {
+                    let val = parseInt(document.getElementById((k - 1) + "" + j).innerHTML);
+                    let nVal = parseInt(document.getElementById(nId).innerHTML);
+                    if (val == nVal) {
+                        if (excludeIds.indexOf(nId) == -1) {
+                            excludeIds.push(nId);
+                            document.getElementById(nId).innerHTML = (val + nVal);
+                            document.getElementById(nId).style.backgroundColor = getColor((val + nVal));
+                            document.getElementById((k - 1) + "" + j).innerHTML = "";
+                            document.getElementById((k - 1) + "" + j).style.backgroundColor = "#ffffff";
+                            isMoved = true;
+                            score += (val + nVal);
+
+                        }
+                    }
+                    break;
+                } else {
+                    document.getElementById(nId).innerHTML = document.getElementById((k - 1) + "" + j).innerHTML;
+                    document.getElementById(nId).style.backgroundColor = document.getElementById((k - 1) + "" + j).style.backgroundColor;
+                    document.getElementById((k - 1) + "" + j).innerHTML = "";
+                    document.getElementById((k - 1) + "" + j).style.backgroundColor = "#ffffff";
+                    isMoved = true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function right() {
+        isMoved = false;
+        excludeIds = [];
+        for (let i = min; i <= max; i++) {
+            for (let j = max; j >= min; j--) {
+                let id = i + "" + j;
+                if (document.getElementById(id).innerHTML != "") {
+                    moveRight(id);
+
+                }
+            }
+        }
+        if (isMoved == true) {
+            update();
+        }
+        return false;
+    }
+
+    function moveRight(id) {
+        if (!id.endsWith(max)) {
+            let arr = id.split("");
+            let i = parseInt(arr[0]);
+            let j = parseInt(arr[1]);
+            for (let k = (j + 1); k <= max; k++) {
+                let nId = i + "" + k;
+                if (document.getElementById(nId).innerHTML != "") {
+                    let val = parseInt(document.getElementById(i + "" + (k - 1)).innerHTML);
+                    let nVal = parseInt(document.getElementById(nId).innerHTML);
+                    if (val == nVal) {
+                        if (excludeIds.indexOf(nId) == -1) {
+                            excludeIds.push(nId);
+                            document.getElementById(nId).innerHTML = (val + nVal);
+                            document.getElementById(nId).style.backgroundColor = getColor((val + nVal));
+                            document.getElementById(i + "" + (k - 1)).innerHTML = "";
+                            document.getElementById(i + "" + (k - 1)).style.backgroundColor = "#ffffff";
+                            isMoved = true;
+                            score += (val + nVal);
+
+                        }
+                    }
+                    break;
+                } else {
+                    document.getElementById(nId).innerHTML = document.getElementById(i + "" + (k - 1)).innerHTML;
+                    document.getElementById(nId).style.backgroundColor = document.getElementById(i + "" + (k - 1)).style.backgroundColor;
+                    document.getElementById(i + "" + (k - 1)).innerHTML = "";
+                    document.getElementById(i + "" + (k - 1)).style.backgroundColor = "#ffffff";
+                    isMoved = true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function update() {
+        //thêm giá trị mới
+        let ids = [];
+        for (let i = min; i <= max; i++) {
+            for (let j = min; j <= max; j++) {
+                let id = i + "" + j;
+                if (document.getElementById(id).innerHTML == "") {
+                    ids.push(id);
+                }
+            }
+        }
+        let id = ids[Math.floor(Math.random() * ids.length)];
+        document.getElementById(id).innerHTML = "2";
+        document.getElementById(id).style.backgroundColor = getColor(2);
+
+        //kiểm tra xem không còn chỗ di chuyển nào
+        let allFilled = true;
+        for (let i = min; i <= max; i++) {
+            for (let j = min; j <= max; j++) {
+                let id = i + "" + j;
+                if (document.getElementById(id).innerHTML == "") {
+                    allFilled = false;
+                    break;
+                }
+            }
+        }
+        //cập nhật điểm
+        document.getElementById("score").innerHTML = score;
+        if (allFilled) {
+            checkGameOver();
+        }
+    }
+
+    function checkGameOver() {
+        let isOver = true;
+        for (let j = min; j <= max; j++) {
+            for (let i = min; i <= (max - 1); i++) {
+                //alert(i+" "+j);
+                let val = parseInt(document.getElementById(i + "" + j).innerHTML);
+                let nVal = parseInt(document.getElementById((i + 1) + "" + j).innerHTML);
+                if (val == nVal) {
+                    isOver = false;
+                    break;
+                }
+            }
+        }
+
+        if (isOver) {
+            amthanhover.play()
+            alert("Game over!");
+            load();
+        }
+        return false;
+    }
+
+    function getColor(val) {
+        let color = "#ffffff";
+        switch (val) {
+            case 2:
+                color = "#F6CED8";
+                break;
+            case 4:
+                color = "#F7BE81";
+                break;
+            case 8:
+                color = "#F3F781";
+                break;
+            case 16:
+                color = "#BEF781";
+                break;
+            case 32:
+                color = "#81F7D8";
+                break;
+            case 64:
+                color = "#58D3F7";
+                break;
+            case 128:
+                color = "#FA58F4";
+                break;
+            case 256:
+                color = "#A901DB";
+                break;
+            case 512:
+                color = "#01DF3A";
+                break;
+            case 1024:
+                color = "#D7DF01";
+                break;
+            case 2048:
+                color = "#D7DF01";
+                break;
+            default:
+                color = "#ffffff";
+        }
+        return color;
+    }
+
+
+    document.onkeydown = function (e) {
+        e.preventDefault();//để ngăn chặn cuộn màn hình
+        switch (e.keyCode) {
+            case 37:
+                left();
+                break;
+            case 38:
+                up();
+                break;
+            case 39:
+                right();
+                break;
+            case 40:
+                down();
+                break;
+        }
+    };
+    // gọi phương thức load
+    load();
+    //-->
+</script>
+</body>
+</html>
